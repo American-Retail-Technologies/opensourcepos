@@ -729,6 +729,7 @@ class Sale extends CI_Model
 	{
 		foreach($sales_taxes as $line=>$sales_tax)
 		{
+			unset($sales_tax['tax_group_display']);
 			$sales_tax['sale_id'] = $sale_id;
 			$this->db->insert('sales_taxes', $sales_tax);
 		}

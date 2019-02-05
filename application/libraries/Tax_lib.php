@@ -171,6 +171,7 @@ class Tax_lib
 				'sale_id' => $sale_id,
 				'tax_type' => $tax_type,
 				'tax_group' => $tax_group,
+				'tax_group_display' => str_replace('%', '&#37;', $tax_group),
 				'sale_tax_basis' => $tax_basis,
 				'sale_tax_amount' => $item_tax_amount,
 				'print_sequence' => $tax_group_sequence,
