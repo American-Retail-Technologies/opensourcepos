@@ -26,7 +26,7 @@
 				<div id="login_form">
 					<div class="input-group">
 						<span class="input-group-addon input-sm"><span class="glyphicon glyphicon-user"></span></span>
-						<input class="form-control" placeholder="<?php echo $this->lang->line('login_username')?>" name="username" type="username" size=20 autofocus></input>
+						<input class="form-control" placeholder="<?php echo $this->lang->line('login_username')?>" name="username" type="text" size=20 autofocus></input>
 					</div>
 
 					<div class="input-group">
@@ -42,7 +42,7 @@
 					}
 					?>
 
-					<input class="btn btn-primary btn-block" type="submit" name="loginButton" value="Go"/>
+					<input class="btn btn-primary btn-block" type="submit" name="loginButton" value="<?php echo $this->lang->line('login_go')?>"/>
 				</div>
 			</div>
 		<?php echo form_close(); ?>

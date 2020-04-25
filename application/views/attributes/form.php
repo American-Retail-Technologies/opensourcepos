@@ -6,7 +6,7 @@
 <fieldset id="attribute_basic_info">
 
 	<div class="form-group form-group-sm">
-		<?php echo form_label($this->lang->line('attributes_definition_name'), 'definition_name', array('class' => 'control-label col-xs-3')); ?>
+		<?php echo form_label($this->lang->line('attributes_definition_name'), 'definition_name', array('class'=>'required control-label col-xs-3')); ?>
 		<div class='col-xs-8'>
 			<?php echo form_input(array(
 					'name'=>'definition_name',
@@ -17,9 +17,9 @@
 	</div>
 
 	<div class="form-group form-group-sm">
-		<?php echo form_label($this->lang->line('attributes_definition_type'), 'definition_type', array('class'=>'control-label col-xs-3')); ?>
+		<?php echo form_label($this->lang->line('attributes_definition_type'), 'definition_type', array('class'=>'required control-label col-xs-3')); ?>
 		<div class='col-xs-8'>
-			<?php echo form_dropdown('definition_type', DEFINITION_TYPES, array_search($definition_info->definition_type, DEFINITION_TYPES), 'id="definition_type" class="form-control" ' . ($definition_id != -1 ? 'disabled="disabled"' : ''));?>
+			<?php echo form_dropdown('definition_type', DEFINITION_TYPES, array_search($definition_info->definition_type, DEFINITION_TYPES), 'id="definition_type" class="form-control"');?>
 		</div>
 	</div>
 
@@ -40,13 +40,22 @@
 	</div>
 
 	<div class="form-group form-group-sm hidden">
+		<?php echo form_label($this->lang->line('attributes_definition_unit'), 'definition_units', array('class' => 'control-label col-xs-3')); ?>
+		<div class='col-xs-8'>
+			<div class="input-group">
+				<?php echo form_input(array('name'=>'definition_unit', 'value'=>$definition_info->definition_unit,'class'=>'form-control input-sm', 'id' => 'definition_unit'));?>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group form-group-sm hidden">
 		<?php echo form_label($this->lang->line('attributes_definition_values'), 'definition_value', array('class' => 'control-label col-xs-3')); ?>
 		<div class='col-xs-8'>
 			<div class="input-group">
 				<?php echo form_input(array('name'=>'definition_value', 'class'=>'form-control input-sm', 'id' => 'definition_value'));?>
 				<span id="add_attribute_value" class="input-group-addon input-sm btn btn-default">
-                    <span class="glyphicon glyphicon-plus-sign"></span>
-                </span>
+					<span class="glyphicon glyphicon-plus-sign"></span>
+				</span>
 			</div>
 		</div>
 	</div>
@@ -69,11 +78,35 @@ $(document).ready(function()
 	var definition_id = <?php echo $definition_id; ?>;
 	var is_new = definition_id == -1;
 
+	var disable_definition_types = function()
+	{
+		var definition_type = $("#definition_type option:selected").text();
+
+		if(definition_type == "DATE" || (definition_type == "GROUP" && !is_new) || definition_type == "DECIMAL")
+		{
+			$('#definition_type').prop("disabled",true);
+		}
+		else if(definition_type == "DROPDOWN" || definition_type == "CHECKBOX")
+		{
+			$("#definition_type option:contains('GROUP')").hide();
+			$("#definition_type option:contains('DATE')").hide();
+			$("#definition_type option:contains('DECIMAL')").hide();
+		}
+		else
+		{
+			$("#definition_type option:contains('GROUP')").hide();
+		}
+	}
+	disable_definition_types();
+
 	var show_hide_fields = function(event)
 	{
 	    var is_dropdown = $('#definition_type').val() !== '1';
+	    var is_decimal = $('#definition_type').val() !== '2';
 	    var is_no_group = $('#definition_type').val() !== '0';
+
 		$('#definition_value, #definition_list_group').parents('.form-group').toggleClass('hidden', is_dropdown);
+		$('#definition_unit').parents('.form-group').toggleClass('hidden', is_decimal);
 		$('#definition_flags').parents('.form-group').toggleClass('hidden', !is_no_group);
 	};
 
@@ -95,7 +128,7 @@ $(document).ready(function()
 		}
 		else
 		{
-			$.post('<?php echo site_url($controller_name . "/delete_attribute_value/");?>' + value, {definition_id: definition_id});
+			$.post('<?php echo site_url($controller_name . "/delete_attribute_value/");?>' + escape(value), {definition_id: definition_id});
 		}
 		$(this).parents("li").remove();
 	};
@@ -104,7 +137,7 @@ $(document).ready(function()
 	{
 		var is_event = typeof(value) !== 'string';
 
-        if ($("#definition_value").val().match(/(\||:)/g) != null)
+        if ($("#definition_value").val().match(/(\||_)/g) != null)
         {
             return;
         }
@@ -124,7 +157,7 @@ $(document).ready(function()
 			}
 			else
 			{
-				$.post('<?php echo site_url("attributes/save_attribute_value/");?>' + value, {definition_id: definition_id});
+				$.post('<?php echo site_url("attributes/save_attribute_value/");?>' + escape(value), {definition_id: definition_id});
 			}
 		}
 
@@ -148,8 +181,12 @@ $(document).ready(function()
 	});
 
 	$.validator.addMethod('valid_chars', function(value, element) {
-        return value.match(/(\||:)/g) == null;
+        return value.match(/(\||_)/g) == null;
 	}, "<?php echo $this->lang->line('attributes_attribute_value_invalid_chars'); ?>");
+
+	$('form').bind('submit', function () {
+		$(this).find(':input').prop('disabled', false);
+	});
 
 	$('#attribute_form').validate($.extend({
 		submitHandler: function(form)

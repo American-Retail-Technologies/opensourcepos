@@ -25,8 +25,8 @@
 		<!-- start css template tags -->
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.autocomplete.css"/>
 		<link rel="stylesheet" type="text/css" href="css/invoice.css"/>
-		<link rel="stylesheet" type="text/css" href="css/ospos_print.css"/>
 		<link rel="stylesheet" type="text/css" href="css/ospos.css"/>
+		<link rel="stylesheet" type="text/css" href="css/ospos_print.css"/>
 		<link rel="stylesheet" type="text/css" href="css/popupbox.css"/>
 		<link rel="stylesheet" type="text/css" href="css/receipt.css"/>
 		<link rel="stylesheet" type="text/css" href="css/register.css"/>
@@ -74,11 +74,10 @@
 		<![endif]-->
 		<!-- start mincss template tags -->
 		<link rel="stylesheet" type="text/css" href="dist/jquery-ui/jquery-ui.min.css"/>
-		<link rel="stylesheet" type="text/css" href="dist/opensourcepos.min.css?rel=9d5e70d863"/>
+		<link rel="stylesheet" type="text/css" href="dist/opensourcepos.min.css?rel=397f582d3d"/>
 		<!-- end mincss template tags -->
-		<link rel="stylesheet" type="text/css" href="css/ospos.css"/>
 		<!-- start minjs template tags -->
-		<script type="text/javascript" src="dist/opensourcepos.min.js?rel=0d82732b74"></script>
+		<script type="text/javascript" src="dist/opensourcepos.min.js?rel=a429d1fc17"></script>
 		<!-- end minjs template tags -->
 	<?php endif; ?>
 

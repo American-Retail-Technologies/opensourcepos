@@ -16,9 +16,9 @@ class Attributes extends Secure_Controller
 		$this->load->view('attributes/manage', $data);
 	}
 
-	/*
-	Returns customer table data rows. This will be called with AJAX.
-	*/
+	/**
+	 * Returns customer table data rows. This will be called with AJAX.
+	 */
 	public function search()
 	{
 		$search = $this->input->get('search');
@@ -44,7 +44,7 @@ class Attributes extends Secure_Controller
 
 	public function save_attribute_value($attribute_value)
 	{
- 		$success = $this->Attribute->save_value(urldecode($attribute_value), $this->input->post('definition_id'), $this->input->post('item_id'), $this->input->post('attribute_id'));
+		$success = $this->Attribute->save_value(urldecode($attribute_value), $this->input->post('definition_id'), $this->input->post('item_id'), $this->input->post('attribute_id'));
 
 		echo json_encode(array('success' => $success != 0));
 	}
@@ -58,7 +58,6 @@ class Attributes extends Secure_Controller
 
 	public function save_definition($definition_id = -1)
 	{
-
 		$definition_flags = 0;
 
 		$flags = (empty($this->input->post('definition_flags'))) ? array() : $this->input->post('definition_flags');
@@ -68,9 +67,10 @@ class Attributes extends Secure_Controller
 			$definition_flags |= $flag;
 		}
 
-		//Save definition data
+	//Save definition data
 		$definition_data = array(
 			'definition_name' => $this->input->post('definition_name'),
+			'definition_unit' => $this->input->post('definition_unit') != '' ? $this->input->post('definition_unit') : NULL,
 			'definition_flags' => $definition_flags,
 			'definition_fk' => $this->input->post('definition_group') != '' ? $this->input->post('definition_group') : NULL
 		);
@@ -84,7 +84,7 @@ class Attributes extends Secure_Controller
 
 		if($this->Attribute->save_definition($definition_data, $definition_id))
 		{
-			//New definition
+		//New definition
 			if($definition_id == -1)
 			{
 				$definition_values = json_decode($this->input->post('definition_values'));
@@ -95,18 +95,19 @@ class Attributes extends Secure_Controller
 				}
 
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('attributes_definition_successful_adding').' '.
-                    $definition_name, 'id' => $definition_data['definition_id']));
+					$definition_name, 'id' => $definition_data['definition_id']));
 			}
-			else //Existing definition
+		//Existing definition
+			else
 			{
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('attributes_definition_successful_updating').' '.
-                    $definition_name, 'id' => $definition_id));
+					$definition_name, 'id' => $definition_id));
 			}
 		}
-		else//failure
+	//Failure
+		else
 		{
-			echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('attribute_definitions_error_adding_updating').' '.
-                $definition_name, 'id' => -1));
+			echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('attributes_definition_error_adding_updating', $definition_name), 'id' => -1));
 		}
 	}
 
@@ -131,7 +132,7 @@ class Attributes extends Secure_Controller
 		$definition_flag_names = array();
 		foreach (Attribute::get_definition_flags() as $id => $term)
 		{
-			if (empty($definition_flags) || ($id & $definition_flags))
+			if ($id & $definition_flags)
 			{
 				$definition_flag_names[$id] = $this->lang->line('attributes_' . strtolower($term) . '_visibility');
 			}
@@ -153,8 +154,10 @@ class Attributes extends Secure_Controller
 		$data['definition_group'][''] = $this->lang->line('common_none_selected_text');
 		$data['definition_info'] = $info;
 
-		$data['definition_flags'] = $this->_get_attributes();
-		$data['selected_definition_flags'] = $this->_get_attributes($info->definition_flags);
+		$show_all = Attribute::SHOW_IN_ITEMS | Attribute::SHOW_IN_RECEIVINGS | Attribute::SHOW_IN_SALES;
+		$data['definition_flags'] = $this->_get_attributes($show_all);
+		$selected_flags = $info->definition_flags === '' ? $show_all : $info->definition_flags;
+		$data['selected_definition_flags'] = $this->_get_attributes($selected_flags);
 
 		$this->load->view("attributes/form", $data);
 	}
@@ -178,5 +181,4 @@ class Attributes extends Secure_Controller
 			echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('attributes_definition_cannot_be_deleted')));
 		}
 	}
-
 }
